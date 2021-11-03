@@ -8,14 +8,16 @@ const TENS: [&str; 9] = ["XC", "LXXX", "LXX", "LX", "L", "XL", "XXX", "XX", "X"]
 
 const UNITS: [&str; 9] = ["IX", "VIII", "VII", "VI", "V", "IV", "III", "II", "I"];
 
-fn thousands(roman: &str, table: &HashMap<String, u16>) -> u16 {
+fn thousands(roman: &str, table: &HashMap<String, u16>) -> (u16, String) {
     let mut num: u16 = 0;
+    let mut piece: String = String::new();
     match is_thousands(roman) {
         Some(_) => {
             for place in THOUSANDS {
                 match roman.strip_prefix(place) {
                     Some(roman) => {
                         num = *table.get(place).unwrap();
+                        piece.push_str(roman);
                         break;
                     }
                     _ => continue,
@@ -24,7 +26,7 @@ fn thousands(roman: &str, table: &HashMap<String, u16>) -> u16 {
         }
         None => (),
     }
-    num
+    (num, piece)
 }
 
 fn is_thousands(roman: &str) -> Option<usize> {
@@ -101,7 +103,7 @@ impl Numeral {
 }
 
 pub fn run(numeral: Numeral) -> Result<u16, String> {
-    Ok(thousands(&numeral.roman, &numeral.table))
+    Ok(thousands(&numeral.roman, &numeral.table).0)
 }
 
 // pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
