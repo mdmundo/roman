@@ -58,6 +58,56 @@ fn is_hundreds(roman: &str) -> Option<usize> {
     roman.find(|c: char| c == 'C' || c == 'D')
 }
 
+fn tens<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
+    let mut num: u16 = 0;
+    let mut piece: &str = roman;
+    match is_tens(roman) {
+        Some(_) => {
+            for place in TENS {
+                match roman.strip_prefix(place) {
+                    Some(roman) => {
+                        num = *table.get(place).unwrap();
+                        piece = roman;
+                        break;
+                    }
+                    _ => continue,
+                }
+            }
+        }
+        None => (),
+    }
+    (num, piece)
+}
+
+fn is_tens(roman: &str) -> Option<usize> {
+    roman.find(|c: char| c == 'X' || c == 'L')
+}
+
+fn units<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
+    let mut num: u16 = 0;
+    let mut piece: &str = roman;
+    match is_units(roman) {
+        Some(_) => {
+            for place in UNITS {
+                match roman.strip_prefix(place) {
+                    Some(roman) => {
+                        num = *table.get(place).unwrap();
+                        piece = roman;
+                        break;
+                    }
+                    _ => continue,
+                }
+            }
+        }
+        None => (),
+    }
+    (num, piece)
+}
+
+fn is_units(roman: &str) -> Option<usize> {
+    roman.find(|c: char| c == 'I' || c == 'V')
+}
+
 pub struct Numeral {
     pub roman: String,
     pub table: HashMap<String, u16>,
@@ -109,7 +159,9 @@ impl Numeral {
 pub fn run(numeral: Numeral) -> Result<u16, String> {
     let (result_thousands, roman) = thousands(&numeral.roman, &numeral.table);
     let (result_hundreds, roman) = hundreds(&roman, &numeral.table);
-    let result = result_thousands + result_hundreds;
+    let (result_tens, roman) = tens(&roman, &numeral.table);
+    let (result_units, _) = units(&roman, &numeral.table);
+    let result = result_thousands + result_hundreds + result_tens + result_units;
     Ok(result)
 }
 
