@@ -223,4 +223,13 @@ mod tests {
 
         assert_eq!(Err("Invalid input"), result);
     }
+
+    #[test]
+    fn greatest_roman_str_run() {
+        let roman = "MMMDCCCLXXXVIII".to_owned();
+        let numeral = Numeral::new(roman).unwrap();
+        let result = run(&numeral);
+
+        assert_eq!(Ok(3_888), result);
+    }
 }
