@@ -1,7 +1,42 @@
+use std::collections::HashMap;
+
 const ROMAN: [&str; 30] = [
     "MMM", "MM", "M", "CM", "DCCC", "DCC", "DC", "D", "CD", "CCC", "CC", "C", "XC", "LXXX", "LXX",
     "LX", "L", "XL", "XXX", "XX", "X", "IX", "VIII", "VII", "VI", "V", "IV", "III", "II", "I",
 ];
+
+const VALUES: HashMap<String, u32> = HashMap::from([
+    ("MMM", 3000),
+    ("MM", 2000),
+    ("M", 1000),
+    ("CM", 900),
+    ("DCCC", 800),
+    ("DCC", 700),
+    ("DC", 600),
+    ("D", 500),
+    ("CD", 400),
+    ("CCC", 300),
+    ("CC", 200),
+    ("C", 100),
+    ("XC", 90),
+    ("LXXX", 80),
+    ("LXX", 70),
+    ("LX", 60),
+    ("L", 50),
+    ("XL", 40),
+    ("XXX", 30),
+    ("XX", 20),
+    ("X", 10),
+    ("IX", 9),
+    ("VIII", 8),
+    ("VII", 7),
+    ("VI", 6),
+    ("V", 5),
+    ("IV", 4),
+    ("III", 3),
+    ("II", 2),
+    ("I", 1),
+]);
 
 //     Thousands   Hundreds    Tens    Units
 // 1   M           C           X       I
@@ -15,12 +50,22 @@ const ROMAN: [&str; 30] = [
 // 9               CM          XC      IX
 
 fn main() {
-    let roman: &str = "MMCDXXI";
-    let decimal: u32 = 0;
-    let decimal = match roman {
-        "MMM" => 3000,
-        _ => 0,
-    };
-    romans.reverse();
-    println!("{:#?}", romans);
+    let mut roman = String::from("MMCDXXI");
+    let mut decimal: u32 = 0;
+    // let decimal = match roman {
+    //     "MMM" => 3000,
+    //     _ => 0,
+    // };
+    for place in ROMAN {
+        match roman.matches(place).next() {
+            // Add actual value later
+            Some(val) => decimal += 1,
+            // Some(val) => {
+            //     println!("{}", val);
+            //     roman = val;
+            //     decimal += 1;
+            // }
+            None => continue,
+        }
+    }
 }
