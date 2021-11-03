@@ -115,9 +115,9 @@ pub struct Numeral {
 }
 
 impl Numeral {
-    pub fn new(roman: String) -> Result<Numeral, String> {
+    pub fn new(roman: &str) -> Result<Numeral, &str> {
         if roman.is_empty() {
-            return Err("Roman numeral required".to_owned());
+            return Err("Roman numeral required");
         }
 
         let table: HashMap<String, u16> = HashMap::from([
@@ -153,18 +153,21 @@ impl Numeral {
             ("I".to_owned(), 1),
         ]);
 
-        Ok(Numeral { roman, table })
+        Ok(Numeral {
+            roman: roman.to_owned(),
+            table,
+        })
     }
 }
 
-pub fn run(numeral: &Numeral) -> Result<u16, String> {
+pub fn run(numeral: &Numeral) -> Result<u16, &str> {
     let (result_thousands, roman) = thousands(&numeral.roman, &numeral.table);
     let (result_hundreds, roman) = hundreds(&roman, &numeral.table);
     let (result_tens, roman) = tens(&roman, &numeral.table);
     let (result_units, roman) = units(&roman, &numeral.table);
     let result = result_thousands + result_hundreds + result_tens + result_units;
     if !roman.is_empty() {
-        Err("Invalid input".to_owned())
+        Err("Invalid input")
     } else {
         Ok(result)
     }
@@ -177,7 +180,7 @@ mod tests {
     #[test]
     fn three_thousands() {
         let roman = "MMMCMXCIX".to_owned();
-        let numeral = Numeral::new(roman).unwrap();
+        let numeral = Numeral::new(&roman).unwrap();
         let result = thousands(&numeral.roman, &numeral.table);
 
         assert_eq!((3_000, "CMXCIX"), result);
@@ -186,7 +189,7 @@ mod tests {
     #[test]
     fn one() {
         let roman = "I".to_owned();
-        let numeral = Numeral::new(roman).unwrap();
+        let numeral = Numeral::new(&roman).unwrap();
         let result = units(&numeral.roman, &numeral.table);
 
         assert_eq!((1, ""), result);
@@ -195,7 +198,7 @@ mod tests {
     #[test]
     fn not_units() {
         let roman = "IIII".to_owned();
-        let numeral = Numeral::new(roman).unwrap();
+        let numeral = Numeral::new(&roman).unwrap();
         let result = units(&numeral.roman, &numeral.table);
 
         assert_eq!((3, "I"), result);
@@ -204,7 +207,7 @@ mod tests {
     #[test]
     fn not_hundreds() {
         let roman = "MMMCMXCIX".to_owned();
-        let numeral = Numeral::new(roman).unwrap();
+        let numeral = Numeral::new(&roman).unwrap();
         let result = hundreds(&numeral.roman, &numeral.table);
 
         assert_eq!((0, "MMMCMXCIX"), result);
@@ -213,7 +216,7 @@ mod tests {
     #[test]
     fn correct_run() {
         let roman = "MMMCMXCIX".to_owned();
-        let numeral = Numeral::new(roman).unwrap();
+        let numeral = Numeral::new(&roman).unwrap();
         let result = run(&numeral);
 
         assert_eq!(3_999, result.unwrap());
@@ -222,9 +225,9 @@ mod tests {
     #[test]
     fn incorrect_run() {
         let roman = "MMMCMXCX".to_owned();
-        let numeral = Numeral::new(roman).unwrap();
+        let numeral = Numeral::new(&roman).unwrap();
         let result = run(&numeral);
 
-        assert_eq!(Err("Invalid input".to_owned()), result);
+        assert_eq!(Err("Invalid input"), result);
     }
 }
