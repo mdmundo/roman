@@ -8,16 +8,16 @@ const TENS: [&str; 9] = ["XC", "LXXX", "LXX", "LX", "L", "XL", "XXX", "XX", "X"]
 
 const UNITS: [&str; 9] = ["IX", "VIII", "VII", "VI", "V", "IV", "III", "II", "I"];
 
-fn thousands(roman: &str, table: &HashMap<String, u16>) -> (u16, String) {
+fn thousands<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
     let mut num: u16 = 0;
-    let mut piece: String = String::new();
+    let mut piece: &str = roman;
     match is_thousands(roman) {
         Some(_) => {
             for place in THOUSANDS {
                 match roman.strip_prefix(place) {
                     Some(roman) => {
                         num = *table.get(place).unwrap();
-                        piece.push_str(roman);
+                        piece = roman;
                         break;
                     }
                     _ => continue,
