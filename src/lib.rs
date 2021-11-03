@@ -8,11 +8,28 @@ const TENS: [&str; 9] = ["XC", "LXXX", "LXX", "LX", "L", "XL", "XXX", "XX", "X"]
 
 const UNITS: [&str; 9] = ["IX", "VIII", "VII", "VI", "V", "IV", "III", "II", "I"];
 
+enum Types {
+    Thousands,
+    Hundreds,
+    Tens,
+    Units,
+}
+
+fn is_it(kind: Types, roman: &str) -> bool {
+    let result = match kind {
+        Types::Thousands => roman.find('M'),
+        Types::Hundreds => roman.find(|c: char| c == 'C' || c == 'D'),
+        Types::Tens => roman.find(|c: char| c == 'X' || c == 'L'),
+        Types::Units => roman.find(|c: char| c == 'I' || c == 'V'),
+    };
+    result.is_some()
+}
+
 fn thousands<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
     let mut num: u16 = 0;
     let mut piece: &str = roman;
-    match is_thousands(roman) {
-        Some(_) => {
+    match is_it(Types::Thousands, roman) {
+        true => {
             for place in THOUSANDS {
                 match roman.strip_prefix(place) {
                     Some(roman) => {
@@ -24,20 +41,16 @@ fn thousands<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str)
                 }
             }
         }
-        None => (),
+        false => (),
     }
     (num, piece)
-}
-
-fn is_thousands(roman: &str) -> Option<usize> {
-    roman.find('M')
 }
 
 fn hundreds<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
     let mut num: u16 = 0;
     let mut piece: &str = roman;
-    match is_hundreds(roman) {
-        Some(_) => {
+    match is_it(Types::Hundreds, roman) {
+        true => {
             for place in HUNDREDS {
                 match roman.strip_prefix(place) {
                     Some(roman) => {
@@ -49,20 +62,16 @@ fn hundreds<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) 
                 }
             }
         }
-        None => (),
+        false => (),
     }
     (num, piece)
-}
-
-fn is_hundreds(roman: &str) -> Option<usize> {
-    roman.find(|c: char| c == 'C' || c == 'D')
 }
 
 fn tens<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
     let mut num: u16 = 0;
     let mut piece: &str = roman;
-    match is_tens(roman) {
-        Some(_) => {
+    match is_it(Types::Tens, roman) {
+        true => {
             for place in TENS {
                 match roman.strip_prefix(place) {
                     Some(roman) => {
@@ -74,20 +83,16 @@ fn tens<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
                 }
             }
         }
-        None => (),
+        false => (),
     }
     (num, piece)
-}
-
-fn is_tens(roman: &str) -> Option<usize> {
-    roman.find(|c: char| c == 'X' || c == 'L')
 }
 
 fn units<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
     let mut num: u16 = 0;
     let mut piece: &str = roman;
-    match is_units(roman) {
-        Some(_) => {
+    match is_it(Types::Units, roman) {
+        true => {
             for place in UNITS {
                 match roman.strip_prefix(place) {
                     Some(roman) => {
@@ -99,13 +104,9 @@ fn units<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
                 }
             }
         }
-        None => (),
+        false => (),
     }
     (num, piece)
-}
-
-fn is_units(roman: &str) -> Option<usize> {
-    roman.find(|c: char| c == 'I' || c == 'V')
 }
 
 pub struct Numeral {
