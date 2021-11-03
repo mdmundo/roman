@@ -161,7 +161,70 @@ pub fn run(numeral: &Numeral) -> Result<u16, String> {
     let (result_thousands, roman) = thousands(&numeral.roman, &numeral.table);
     let (result_hundreds, roman) = hundreds(&roman, &numeral.table);
     let (result_tens, roman) = tens(&roman, &numeral.table);
-    let (result_units, _) = units(&roman, &numeral.table);
+    let (result_units, roman) = units(&roman, &numeral.table);
     let result = result_thousands + result_hundreds + result_tens + result_units;
-    Ok(result)
+    if !roman.is_empty() {
+        Err("Invalid input".to_owned())
+    } else {
+        Ok(result)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn three_thousands() {
+        let roman = "MMMCMXCIX".to_owned();
+        let numeral = Numeral::new(roman).unwrap();
+        let result = thousands(&numeral.roman, &numeral.table);
+
+        assert_eq!((3_000, "CMXCIX"), result);
+    }
+
+    #[test]
+    fn one() {
+        let roman = "I".to_owned();
+        let numeral = Numeral::new(roman).unwrap();
+        let result = units(&numeral.roman, &numeral.table);
+
+        assert_eq!((1, ""), result);
+    }
+
+    #[test]
+    fn not_units() {
+        let roman = "IIII".to_owned();
+        let numeral = Numeral::new(roman).unwrap();
+        let result = units(&numeral.roman, &numeral.table);
+
+        assert_eq!((3, "I"), result);
+    }
+
+    #[test]
+    fn not_hundreds() {
+        let roman = "MMMCMXCIX".to_owned();
+        let numeral = Numeral::new(roman).unwrap();
+        let result = hundreds(&numeral.roman, &numeral.table);
+
+        assert_eq!((0, "MMMCMXCIX"), result);
+    }
+
+    #[test]
+    fn correct_run() {
+        let roman = "MMMCMXCIX".to_owned();
+        let numeral = Numeral::new(roman).unwrap();
+        let result = run(&numeral);
+
+        assert_eq!(3_999, result.unwrap());
+    }
+
+    #[test]
+    fn incorrect_run() {
+        let roman = "MMMCMXCX".to_owned();
+        let numeral = Numeral::new(roman).unwrap();
+        let result = run(&numeral);
+
+        assert_eq!(Err("Invalid input".to_owned()), result);
+    }
 }
