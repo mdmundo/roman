@@ -1,12 +1,99 @@
 use std::collections::HashMap;
 
-const THOUSANDS: [&str; 3] = ["MMM", "MM", "M"];
+pub struct Numeral {
+    pub roman: String,
+    pub table: HashMap<&'static str, u16>,
+    pub thousands: Vec<&'static str>,
+    pub hundreds: Vec<&'static str>,
+    pub tens: Vec<&'static str>,
+    pub units: Vec<&'static str>,
+}
 
-const HUNDREDS: [&str; 9] = ["CM", "DCCC", "DCC", "DC", "D", "CD", "CCC", "CC", "C"];
+impl Numeral {
+    pub fn new(roman: String) -> Result<Numeral, &'static str> {
+        if roman.is_empty() {
+            return Err("Roman numeral required");
+        }
 
-const TENS: [&str; 9] = ["XC", "LXXX", "LXX", "LX", "L", "XL", "XXX", "XX", "X"];
+        let mmm = "MMM";
+        let mm = "MM";
+        let m = "M";
+        let cm = "CM";
+        let dccc = "DCCC";
+        let dcc = "DCC";
+        let dc = "DC";
+        let d = "D";
+        let cd = "CD";
+        let ccc = "CCC";
+        let cc = "CC";
+        let c = "C";
+        let xc = "XC";
+        let lxxx = "LXXX";
+        let lxx = "LXX";
+        let lx = "LX";
+        let l = "L";
+        let xl = "XL";
+        let xxx = "XXX";
+        let xx = "XX";
+        let x = "X";
+        let ix = "IX";
+        let viii = "VIII";
+        let vii = "VII";
+        let vi = "VI";
+        let v = "V";
+        let iv = "IV";
+        let iii = "III";
+        let ii = "II";
+        let i = "I";
 
-const UNITS: [&str; 9] = ["IX", "VIII", "VII", "VI", "V", "IV", "III", "II", "I"];
+        let table: HashMap<&str, u16> = HashMap::from([
+            (mmm, 3000),
+            (mm, 2000),
+            (m, 1000),
+            (cm, 900),
+            (dccc, 800),
+            (dcc, 700),
+            (dc, 600),
+            (d, 500),
+            (cd, 400),
+            (ccc, 300),
+            (cc, 200),
+            (c, 100),
+            (xc, 90),
+            (lxxx, 80),
+            (lxx, 70),
+            (lx, 60),
+            (l, 50),
+            (xl, 40),
+            (xxx, 30),
+            (xx, 20),
+            (x, 10),
+            (ix, 9),
+            (viii, 8),
+            (vii, 7),
+            (vi, 6),
+            (v, 5),
+            (iv, 4),
+            (iii, 3),
+            (ii, 2),
+            (i, 1),
+        ]);
+
+        let thousands = vec![mmm, mm, m];
+        let hundreds = vec![cm, dccc, dcc, dc, d, cd, ccc, cc, c];
+        let tens = vec![xc, lxxx, lxx, lx, l, xl, xxx, xx, x];
+        let units = vec![ix, viii, vii, vi, v, iv, iii, ii, i];
+
+        Ok(Numeral {
+            roman,
+            table,
+            thousands,
+            hundreds,
+            tens,
+            units,
+        })
+    }
+}
 
 enum Types {
     Thousands,
@@ -25,12 +112,17 @@ fn is_it(kind: Types, roman: &str) -> bool {
     result.is_some()
 }
 
-fn thousands<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
+fn get<'a>(
+    roman: &'a str,
+    table: &HashMap<&str, u16>,
+    kind: Types,
+    array: &Vec<&str>,
+) -> (u16, &'a str) {
     let mut num: u16 = 0;
     let mut piece: &str = roman;
-    match is_it(Types::Thousands, roman) {
+    match is_it(kind, roman) {
         true => {
-            for place in THOUSANDS {
+            for place in array {
                 match roman.strip_prefix(place) {
                     Some(roman) => {
                         num = *table.get(place).unwrap();
@@ -44,127 +136,18 @@ fn thousands<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str)
         false => (),
     }
     (num, piece)
-}
-
-fn hundreds<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
-    let mut num: u16 = 0;
-    let mut piece: &str = roman;
-    match is_it(Types::Hundreds, roman) {
-        true => {
-            for place in HUNDREDS {
-                match roman.strip_prefix(place) {
-                    Some(roman) => {
-                        num = *table.get(place).unwrap();
-                        piece = roman;
-                        break;
-                    }
-                    _ => continue,
-                }
-            }
-        }
-        false => (),
-    }
-    (num, piece)
-}
-
-fn tens<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
-    let mut num: u16 = 0;
-    let mut piece: &str = roman;
-    match is_it(Types::Tens, roman) {
-        true => {
-            for place in TENS {
-                match roman.strip_prefix(place) {
-                    Some(roman) => {
-                        num = *table.get(place).unwrap();
-                        piece = roman;
-                        break;
-                    }
-                    _ => continue,
-                }
-            }
-        }
-        false => (),
-    }
-    (num, piece)
-}
-
-fn units<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
-    let mut num: u16 = 0;
-    let mut piece: &str = roman;
-    match is_it(Types::Units, roman) {
-        true => {
-            for place in UNITS {
-                match roman.strip_prefix(place) {
-                    Some(roman) => {
-                        num = *table.get(place).unwrap();
-                        piece = roman;
-                        break;
-                    }
-                    _ => continue,
-                }
-            }
-        }
-        false => (),
-    }
-    (num, piece)
-}
-
-pub struct Numeral {
-    pub roman: String,
-    pub table: HashMap<String, u16>,
-}
-
-impl Numeral {
-    pub fn new(roman: &str) -> Result<Numeral, &str> {
-        if roman.is_empty() {
-            return Err("Roman numeral required");
-        }
-
-        let table: HashMap<String, u16> = HashMap::from([
-            ("MMM".to_owned(), 3000),
-            ("MM".to_owned(), 2000),
-            ("M".to_owned(), 1000),
-            ("CM".to_owned(), 900),
-            ("DCCC".to_owned(), 800),
-            ("DCC".to_owned(), 700),
-            ("DC".to_owned(), 600),
-            ("D".to_owned(), 500),
-            ("CD".to_owned(), 400),
-            ("CCC".to_owned(), 300),
-            ("CC".to_owned(), 200),
-            ("C".to_owned(), 100),
-            ("XC".to_owned(), 90),
-            ("LXXX".to_owned(), 80),
-            ("LXX".to_owned(), 70),
-            ("LX".to_owned(), 60),
-            ("L".to_owned(), 50),
-            ("XL".to_owned(), 40),
-            ("XXX".to_owned(), 30),
-            ("XX".to_owned(), 20),
-            ("X".to_owned(), 10),
-            ("IX".to_owned(), 9),
-            ("VIII".to_owned(), 8),
-            ("VII".to_owned(), 7),
-            ("VI".to_owned(), 6),
-            ("V".to_owned(), 5),
-            ("IV".to_owned(), 4),
-            ("III".to_owned(), 3),
-            ("II".to_owned(), 2),
-            ("I".to_owned(), 1),
-        ]);
-
-        Ok(Numeral {
-            roman: roman.to_owned(),
-            table,
-        })
-    }
 }
 
 pub fn run(numeral: &Numeral) -> Result<u16, &str> {
-    let (result_thousands, roman) = thousands(&numeral.roman, &numeral.table);
-    let (result_hundreds, roman) = hundreds(&roman, &numeral.table);
-    let (result_tens, roman) = tens(&roman, &numeral.table);
-    let (result_units, roman) = units(&roman, &numeral.table);
+    let (result_thousands, roman) = get(
+        &numeral.roman,
+        &numeral.table,
+        Types::Thousands,
+        &numeral.thousands,
+    );
+    let (result_hundreds, roman) = get(&roman, &numeral.table, Types::Hundreds, &numeral.hundreds);
+    let (result_tens, roman) = get(&roman, &numeral.table, Types::Tens, &numeral.tens);
+    let (result_units, roman) = get(&roman, &numeral.table, Types::Units, &numeral.units);
     let result = result_thousands + result_hundreds + result_tens + result_units;
     if !roman.is_empty() {
         Err("Invalid input")
@@ -180,8 +163,13 @@ mod tests {
     #[test]
     fn three_thousands() {
         let roman = "MMMCMXCIX".to_owned();
-        let numeral = Numeral::new(&roman).unwrap();
-        let result = thousands(&numeral.roman, &numeral.table);
+        let numeral = Numeral::new(roman).unwrap();
+        let result = get(
+            &numeral.roman,
+            &numeral.table,
+            Types::Thousands,
+            &numeral.thousands,
+        );
 
         assert_eq!((3_000, "CMXCIX"), result);
     }
@@ -189,8 +177,8 @@ mod tests {
     #[test]
     fn one() {
         let roman = "I".to_owned();
-        let numeral = Numeral::new(&roman).unwrap();
-        let result = units(&numeral.roman, &numeral.table);
+        let numeral = Numeral::new(roman).unwrap();
+        let result = get(&numeral.roman, &numeral.table, Types::Units, &numeral.units);
 
         assert_eq!((1, ""), result);
     }
@@ -198,8 +186,8 @@ mod tests {
     #[test]
     fn not_units() {
         let roman = "IIII".to_owned();
-        let numeral = Numeral::new(&roman).unwrap();
-        let result = units(&numeral.roman, &numeral.table);
+        let numeral = Numeral::new(roman).unwrap();
+        let result = get(&numeral.roman, &numeral.table, Types::Units, &numeral.units);
 
         assert_eq!((3, "I"), result);
     }
@@ -207,8 +195,13 @@ mod tests {
     #[test]
     fn not_hundreds() {
         let roman = "MMMCMXCIX".to_owned();
-        let numeral = Numeral::new(&roman).unwrap();
-        let result = hundreds(&numeral.roman, &numeral.table);
+        let numeral = Numeral::new(roman).unwrap();
+        let result = get(
+            &numeral.roman,
+            &numeral.table,
+            Types::Hundreds,
+            &numeral.hundreds,
+        );
 
         assert_eq!((0, "MMMCMXCIX"), result);
     }
@@ -216,7 +209,7 @@ mod tests {
     #[test]
     fn correct_run() {
         let roman = "MMMCMXCIX".to_owned();
-        let numeral = Numeral::new(&roman).unwrap();
+        let numeral = Numeral::new(roman).unwrap();
         let result = run(&numeral);
 
         assert_eq!(3_999, result.unwrap());
@@ -225,7 +218,7 @@ mod tests {
     #[test]
     fn incorrect_run() {
         let roman = "MMMCMXCX".to_owned();
-        let numeral = Numeral::new(&roman).unwrap();
+        let numeral = Numeral::new(roman).unwrap();
         let result = run(&numeral);
 
         assert_eq!(Err("Invalid input"), result);
