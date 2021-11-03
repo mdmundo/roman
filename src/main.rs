@@ -57,6 +57,66 @@ fn main() {
                 decimal += table.get(place).unwrap();
                 assert_eq!(decimal, 3_000);
                 // call next for loop
+
+                for place in HUNDREDS {
+                    println!("---");
+                    println!("place: {}", place);
+                    println!(
+                        "roman.strip_prefix(place).unwrap(): {}",
+                        roman.strip_prefix(place).unwrap()
+                    );
+                    match roman.strip_prefix(place) {
+                        Some(roman) => {
+                            println!("roman: {}", roman);
+                            decimal += table.get(place).unwrap();
+                            assert_eq!(decimal, 3_900);
+                            // call next for loop
+
+                            for place in TENS {
+                                println!("---");
+                                println!("place: {}", place);
+                                println!(
+                                    "roman.strip_prefix(place).unwrap(): {}",
+                                    roman.strip_prefix(place).unwrap()
+                                );
+                                match roman.strip_prefix(place) {
+                                    Some(roman) => {
+                                        println!("roman: {}", roman);
+                                        decimal += table.get(place).unwrap();
+                                        assert_eq!(decimal, 3_990);
+                                        // call next for loop
+
+                                        for place in UNITS {
+                                            println!("---");
+                                            println!("place: {}", place);
+                                            println!(
+                                                "roman.strip_prefix(place).unwrap(): {}",
+                                                roman.strip_prefix(place).unwrap()
+                                            );
+                                            match roman.strip_prefix(place) {
+                                                Some(roman) => {
+                                                    println!("roman: {}", roman);
+                                                    decimal += table.get(place).unwrap();
+                                                    assert_eq!(decimal, 3_999);
+                                                    // call next for loop
+                                                    break;
+                                                }
+                                                _ => break,
+                                            }
+                                        }
+
+                                        break;
+                                    }
+                                    _ => break,
+                                }
+                            }
+
+                            break;
+                        }
+                        _ => break,
+                    }
+                }
+
                 break;
             }
             _ => break,
