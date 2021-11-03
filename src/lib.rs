@@ -157,7 +157,7 @@ impl Numeral {
     }
 }
 
-pub fn run(numeral: Numeral) -> Result<u16, String> {
+pub fn run(numeral: &Numeral) -> Result<u16, String> {
     let (result_thousands, roman) = thousands(&numeral.roman, &numeral.table);
     let (result_hundreds, roman) = hundreds(&roman, &numeral.table);
     let (result_tens, roman) = tens(&roman, &numeral.table);
