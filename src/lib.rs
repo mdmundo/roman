@@ -33,26 +33,30 @@ fn is_thousands(roman: &str) -> Option<usize> {
     roman.find('M')
 }
 
-// fn hundreds(decimal: &mut u16, roman: &str) {
-//     match is_hundreds(roman) {
-//         Some(_) => {
-//             for place in HUNDREDS {
-//                 match roman.strip_prefix(place) {
-//                     Some(roman) => {
-//                         *decimal += table.get(place).unwrap();
-//                         break;
-//                     }
-//                     _ => continue,
-//                 }
-//             }
-//         }
-//         None => (),
-//     }
-// }
+fn hundreds<'a>(roman: &'a str, table: &HashMap<String, u16>) -> (u16, &'a str) {
+    let mut num: u16 = 0;
+    let mut piece: &str = roman;
+    match is_hundreds(roman) {
+        Some(_) => {
+            for place in HUNDREDS {
+                match roman.strip_prefix(place) {
+                    Some(roman) => {
+                        num = *table.get(place).unwrap();
+                        piece = roman;
+                        break;
+                    }
+                    _ => continue,
+                }
+            }
+        }
+        None => (),
+    }
+    (num, piece)
+}
 
-// fn is_hundreds(roman: &str) -> Option<usize> {
-//     roman.find(|c: char| c == 'C' || c == 'D')
-// }
+fn is_hundreds(roman: &str) -> Option<usize> {
+    roman.find(|c: char| c == 'C' || c == 'D')
+}
 
 pub struct Numeral {
     pub roman: String,
@@ -103,7 +107,10 @@ impl Numeral {
 }
 
 pub fn run(numeral: Numeral) -> Result<u16, String> {
-    Ok(thousands(&numeral.roman, &numeral.table).0)
+    let (result_thousands, roman) = thousands(&numeral.roman, &numeral.table);
+    let (result_hundreds, roman) = hundreds(&roman, &numeral.table);
+    let result = result_thousands + result_hundreds;
+    Ok(result)
 }
 
 // pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
