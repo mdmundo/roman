@@ -15,6 +15,8 @@ impl Numeral {
             return Err("Roman numeral required");
         }
 
+        let roman = roman.to_uppercase();
+
         let mmm = "MMM";
         let mm = "MM";
         let m = "M";
