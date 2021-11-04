@@ -102,7 +102,7 @@ enum Types {
     Units,
 }
 
-fn is_it(kind: Types, roman: &str) -> bool {
+fn is_it(kind: &Types, roman: &str) -> bool {
     let result = match kind {
         Types::Thousands => roman.find('M'),
         Types::Hundreds => roman.find(|c: char| c == 'C' || c == 'D'),
@@ -115,7 +115,7 @@ fn is_it(kind: Types, roman: &str) -> bool {
 fn get<'a>(
     roman: &'a str,
     table: &HashMap<&str, u16>,
-    kind: Types,
+    kind: &Types,
     array: &Vec<&str>,
 ) -> (u16, &'a str) {
     let mut num: u16 = 0;
@@ -142,12 +142,12 @@ pub fn run(numeral: &Numeral) -> Result<u16, &str> {
     let (result_thousands, roman) = get(
         &numeral.roman,
         &numeral.table,
-        Types::Thousands,
+        &Types::Thousands,
         &numeral.thousands,
     );
-    let (result_hundreds, roman) = get(&roman, &numeral.table, Types::Hundreds, &numeral.hundreds);
-    let (result_tens, roman) = get(&roman, &numeral.table, Types::Tens, &numeral.tens);
-    let (result_units, roman) = get(&roman, &numeral.table, Types::Units, &numeral.units);
+    let (result_hundreds, roman) = get(&roman, &numeral.table, &Types::Hundreds, &numeral.hundreds);
+    let (result_tens, roman) = get(&roman, &numeral.table, &Types::Tens, &numeral.tens);
+    let (result_units, roman) = get(&roman, &numeral.table, &Types::Units, &numeral.units);
     let result = result_thousands + result_hundreds + result_tens + result_units;
     if !roman.is_empty() {
         Err("Invalid input")
@@ -167,7 +167,7 @@ mod tests {
         let result = get(
             &numeral.roman,
             &numeral.table,
-            Types::Thousands,
+            &Types::Thousands,
             &numeral.thousands,
         );
 
@@ -178,7 +178,12 @@ mod tests {
     fn one() {
         let roman = "I".to_owned();
         let numeral = Numeral::new(roman).unwrap();
-        let result = get(&numeral.roman, &numeral.table, Types::Units, &numeral.units);
+        let result = get(
+            &numeral.roman,
+            &numeral.table,
+            &Types::Units,
+            &numeral.units,
+        );
 
         assert_eq!((1, ""), result);
     }
@@ -187,7 +192,12 @@ mod tests {
     fn not_units() {
         let roman = "IIII".to_owned();
         let numeral = Numeral::new(roman).unwrap();
-        let result = get(&numeral.roman, &numeral.table, Types::Units, &numeral.units);
+        let result = get(
+            &numeral.roman,
+            &numeral.table,
+            &Types::Units,
+            &numeral.units,
+        );
 
         assert_eq!((3, "I"), result);
     }
@@ -199,7 +209,7 @@ mod tests {
         let result = get(
             &numeral.roman,
             &numeral.table,
-            Types::Hundreds,
+            &Types::Hundreds,
             &numeral.hundreds,
         );
 
