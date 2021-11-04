@@ -244,4 +244,13 @@ mod tests {
 
         assert_eq!(Ok(3_888), result);
     }
+
+    #[test]
+    fn lowercase_run() {
+        let roman = "mmmdccclxxxviii".to_owned();
+        let numeral = Numeral::new(roman).unwrap();
+        let result = run(&numeral);
+
+        assert_eq!(Ok(3_888), result);
+    }
 }
